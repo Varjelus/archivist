@@ -37,7 +37,7 @@ func (z *zipper) do() error {
 func (z *zipper) walk(path string, info os.FileInfo, err error) error {
     if err != nil { return err }
 
-    if info.IsDir() || info.Size() == 0 {
+    if !info.Mode().IsRegular() || info.Size() == 0 {
         return nil
     }
 
