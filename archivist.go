@@ -2,7 +2,6 @@ package archivist
 
 import (
     "archive/zip"
-    "errors"
     "io"
     "os"
     "path/filepath"
