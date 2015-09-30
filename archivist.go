@@ -91,7 +91,7 @@ func (z *unzipper) unzip(f *zip.File) error {
     fName := filepath.Join(z.dst, f.Name)
     dir, _ := filepath.Split(fName)
 
-    if err := os.MkdirAll(dir, os.ModeDir); err != nil {
+    if err := os.MkdirAll(dir, os.ModeDir); err != nil && os.IsNotExist(err) {
         return err
     }
 
