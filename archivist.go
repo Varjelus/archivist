@@ -77,7 +77,7 @@ func (z *unzipper) do() error {
         r, err := f.Open()
         if err != nil { return err }
 
-        w, err := os.Open(filepath.Join(z.dst, f.Name))
+        w, err := os.Create(filepath.Join(z.dst, f.Name))
         if err != nil {
             z.reader.Close()
             r.Close()
