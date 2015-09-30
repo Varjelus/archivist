@@ -61,7 +61,8 @@ func (z *zipper) walk(path string, info os.FileInfo, err error) error {
 
 type unzipper struct {
     src    string
-    reader *zip.Reader
+    dst    string
+    reader *zip.ReadCloser
 }
 
 // unzipper.do initialises output file and unzips source there
@@ -76,10 +77,27 @@ func (z *unzipper) do() error {
         r, err := f.Open()
         if err != nil { return err }
 
-        _, err := io.Copy(filepath.Join(z.dst, f.Name), r)
-        if err != nil { return err }
+        w, err := os.Open(filepath.Join(z.dst, f.Name))
+        if err != nil {
+            z.reader.Close()
+            r.Close()
+            return err
+        }
+
+        if _, err := io.Copy(w, r); err != nil {
+            z.reader.Close()
+            w.Close()
+            r.Close()
+            return err
+        }
 
         if err := r.Close(); err != nil {
+            w.Close()
+            z.reader.Close()
+            return err
+        }
+
+        if err := w.Close(); err != nil {
             return err
         }
     }
