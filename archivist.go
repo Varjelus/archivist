@@ -119,7 +119,7 @@ func Zip(src, dst string) error {
 }
 
 // Unzip is an exported method which sanitizes io paths and starts unzipping
-func Unzip(src string, dst string) error {
+func Unzip(src, dst string) error {
     z := &unzipper{
         src: filepath.Clean(filepath.FromSlash(src)),
         dst: filepath.Clean(filepath.FromSlash(dst)),
