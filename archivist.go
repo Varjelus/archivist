@@ -74,35 +74,44 @@ func (z *unzipper) do() error {
     if err != nil { return err }
 
     for _, f := range z.reader.File {
-        r, err := f.Open()
-        if err != nil { return err }
-
-        w, err := os.Create(filepath.Join(z.dst, f.Name))
-        if err != nil {
+        if err := z.unzip(f); err != nil {
             z.reader.Close()
-            r.Close()
-            return err
-        }
-
-        if _, err := io.Copy(w, r); err != nil {
-            z.reader.Close()
-            w.Close()
-            r.Close()
-            return err
-        }
-
-        if err := r.Close(); err != nil {
-            w.Close()
-            z.reader.Close()
-            return err
-        }
-
-        if err := w.Close(); err != nil {
             return err
         }
     }
 
     if err := z.reader.Close(); err != nil {
+        return err
+    }
+
+    return nil
+}
+
+func (z *unzipper) unzip(f *zip.File) error {
+    r, err := f.Open()
+    if err != nil { return err }
+
+    w, err := os.Create(filepath.Join(z.dst, f.Name))
+    if err != nil {
+        z.reader.Close()
+        r.Close()
+        return err
+    }
+
+    if _, err := io.Copy(w, r); err != nil {
+        z.reader.Close()
+        w.Close()
+        r.Close()
+        return err
+    }
+
+    if err := r.Close(); err != nil {
+        w.Close()
+        z.reader.Close()
+        return err
+    }
+
+    if err := w.Close(); err != nil {
         return err
     }
 
