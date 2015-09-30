@@ -15,8 +15,7 @@ type zipper struct {
 }
 
 func (z *zipper) do() error {
-    // Output file
-    out, err := os.Create(z.dst)//os.OpenFile(z.dst, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0660)
+    out, err := os.Create(z.dst)
     if err != nil {
         return err
     }
