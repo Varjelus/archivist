@@ -88,8 +88,17 @@ func (z *unzipper) do() error {
 }
 
 func (z *unzipper) unzip(f *zip.File) error {
+    fName := filepath.Join(z.dst, f.Name)
+    dir, _ := filepath.Split(fName)
+
+    if err := os.MkdirAll(dir, os.ModeDir); err != nil {
+        return err
+    }
+
     r, err := f.Open()
-    if err != nil { return err }
+    if err != nil {
+        return err
+    }
 
     w, err := os.Create(filepath.Join(z.dst, f.Name))
     if err != nil {
