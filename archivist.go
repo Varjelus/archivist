@@ -88,6 +88,8 @@ func (z *unzipper) do() error {
 }
 
 func (z *unzipper) unzip(f *zip.File) error {
+    if f.FileInfo().IsDir() { return nil }
+
     fName := filepath.Join(z.dst, f.Name)
     dir, _ := filepath.Split(fName)
 
