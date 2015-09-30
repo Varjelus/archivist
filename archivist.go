@@ -59,9 +59,50 @@ func (z *zipper) walk(path string, info os.FileInfo, err error) error {
     return err
 }
 
-// Store is an exported method which sanitizes io paths and starts archiving
-func Store(src, dst string) error {
+type unzipper struct {
+    src    string
+    reader *zip.Reader
+}
+
+// unzipper.do initialises output file and unzips source there
+func (z *unzipper) do() error {
+    err := os.MkdirAll(z.dst, os.ModeDir)
+    if err != nil { return err }
+
+    z.reader, err = zip.OpenReader(z.src)
+    if err != nil { return err }
+
+    for _, f := range z.reader.File {
+        r, err := f.Open()
+        if err != nil { return err }
+
+        _, err := io.Copy(filepath.Join(z.dst, f.Name), r)
+        if err != nil { return err }
+
+        if err := r.Close(); err != nil {
+            return err
+        }
+    }
+
+    if err := z.reader.Close(); err != nil {
+        return err
+    }
+
+    return nil
+}
+
+// Zip is an exported method which sanitizes io paths and starts archiving
+func Zip(src, dst string) error {
     z := &zipper{
+        src: filepath.Clean(filepath.FromSlash(src)),
+        dst: filepath.Clean(filepath.FromSlash(dst)),
+    }
+    return z.do()
+}
+
+// Unzip is an exported method which sanitizes io paths and starts unzipping
+func Unzip(src string, dst string) error {
+    z := &unzipper{
         src: filepath.Clean(filepath.FromSlash(src)),
         dst: filepath.Clean(filepath.FromSlash(dst)),
     }
