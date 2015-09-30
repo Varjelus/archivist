@@ -14,6 +14,7 @@ type zipper struct {
     writer *zip.Writer
 }
 
+// zipper.do initialises output file, archive and directory tree walk function
 func (z *zipper) do() error {
     out, err := os.Create(z.dst)
     if err != nil {
@@ -32,6 +33,7 @@ func (z *zipper) do() error {
     return out.Close()
 }
 
+// zipper.walk gets called for each file in given directory tree
 func (z *zipper) walk(path string, info os.FileInfo, err error) error {
     if err != nil { return err }
 
@@ -51,10 +53,13 @@ func (z *zipper) walk(path string, info os.FileInfo, err error) error {
         return err
     }
 
+    // Not efficient FIXME
     _, err = io.Copy(w, file)
+
     return err
 }
 
+// Store is an exported method which sanitizes io paths and starts archiving
 func Store(src, dst string) error {
     z := &zipper{
         src: filepath.Clean(filepath.FromSlash(src)),
