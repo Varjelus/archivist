@@ -52,13 +52,11 @@ func (z *unzipper) unzip(f *zip.File) error {
 
     w, err := os.Create(filepath.Join(z.dst, f.Name))
     if err != nil {
-        z.reader.Close()
         r.Close()
         return err
     }
 
     if _, err := io.Copy(w, r); err != nil {
-        z.reader.Close()
         w.Close()
         r.Close()
         return err
@@ -66,7 +64,6 @@ func (z *unzipper) unzip(f *zip.File) error {
 
     if err := r.Close(); err != nil {
         w.Close()
-        z.reader.Close()
         return err
     }
 
