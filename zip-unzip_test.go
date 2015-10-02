@@ -38,24 +38,29 @@ func TestZipUnzip(t *testing.T) {
     original, err = randTempDirStruct()
     if err != nil {
         t.Errorf("Fabricating failed: %s", err.Error())
+        goto cleanup
     }
 
     fmt.Println("[Step 2/5] Zip")
     if err := Zip(original, zipped); err != nil {
         t.Errorf("Zipping failed: %s", err.Error())
+        goto cleanup
     }
 
     fmt.Println("[Step 3/5] Unzip")
     if err := Unzip(zipped, unzipped); err != nil {
         t.Errorf("Unzipping failed: %s", err.Error())
+        goto cleanup
     }
 
     fmt.Println("[Step 4/5] Compare")
     if err := (&comparer{original, unzipped}).compare(); err != nil {
         t.Errorf("Comparison failed: %s", err.Error())
+        goto cleanup
     }
 
     fmt.Println("[Step 5/5] Cleanup")
+ cleanup:
     if err := cleanUp(zipped, unzipped, original); err != nil {
         t.Errorf("cleanUp failed: %s", err.Error())
     }

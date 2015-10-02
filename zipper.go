@@ -53,8 +53,8 @@ func (z *zipper) walk(path string, info os.FileInfo, err error) error {
         return err
     }
 
-    // Not efficient FIXME
-    _, err = io.Copy(w, file)
+    b := make([]byte, 1<<20)
+    _, err = io.CopyBuffer(w, file, b)
 
     return err
 }

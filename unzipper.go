@@ -49,27 +49,23 @@ func (z *unzipper) unzip(f *zip.File) error {
     if err != nil {
         return err
     }
+    defer r.Close()
 
     w, err := os.Create(filepath.Join(z.dst, f.Name))
     if err != nil {
-        r.Close()
         return err
     }
+    defer w.Close()
 
-    if _, err := io.Copy(w, r); err != nil {
+    b := make([]byte, 1<<20)
+    if _, err := io.CopyBuffer(w, r, b); err != nil {
         w.Close()
-        r.Close()
         return err
     }
 
     if err := r.Close(); err != nil {
-        w.Close()
         return err
     }
 
-    if err := w.Close(); err != nil {
-        return err
-    }
-
-    return nil
+    return w.Close()
 }
