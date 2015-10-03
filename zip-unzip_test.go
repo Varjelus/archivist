@@ -27,8 +27,13 @@ const (
 func init() {
     rand.Seed(time.Now().UnixNano())
 
-    zipped      = filepath.Join(os.TempDir(), "archivist_" + randString(rand.Intn(16)+5) + ".zip")
-    unzipped    = filepath.Join(os.TempDir(), "archivist_" + randString(rand.Intn(16)+5) + "_unz")
+    z, err      := filepath.Abs("./archivist_" + randString(rand.Intn(16)+5) + ".zip")
+    if err != nil { panic(err) }
+    zipped      = z
+
+    u, err      := filepath.Abs("./archivist_" + randString(rand.Intn(16)+5) + "_unz")
+    if err != nil { panic(err) }
+    unzipped    = u
 }
 
 func TestZipUnzip(t *testing.T) {
@@ -77,42 +82,44 @@ func cleanUp(paths ...string) error {
 }
 
 func randTempDirStruct() (string, error) {
-    root := "archivist_" + randString(rand.Intn(16)+5)
-    rPath := filepath.Join(os.TempDir(), root)
-
-    if err := os.MkdirAll(rPath, os.ModeDir); err != nil {
+    root, err := filepath.Abs("./archivist_" + randString(rand.Intn(16)+5))
+    if err != nil {
         return root, err
     }
 
-    if err := populateWithFiles(rPath); err != nil {
-        return rPath, err
+    if err := os.MkdirAll(root, perm); err != nil {
+        return root, err
+    }
+
+    if err := populateWithFiles(root); err != nil {
+        return root, err
     }
 
     for i := 0; i < (rand.Intn(10)+1); i++ {
         child := randString(rand.Intn(16)+5)
-        cPath := filepath.Join(rPath, child)
+        cPath := filepath.Join(root, child)
 
-        if err := os.MkdirAll(cPath, os.ModeDir); err != nil {
-            return rPath, err
+        if err := os.MkdirAll(cPath, perm); err != nil {
+            return root, err
         }
         if err := populateWithFiles(cPath); err != nil {
-            return rPath, err
+            return root, err
         }
 
         for j := 0; j < (rand.Intn(10)+1); j++ {
             grandchild := randString(rand.Intn(16)+5)
             gcPath := filepath.Join(cPath, grandchild)
 
-            if err := os.MkdirAll(gcPath, os.ModeDir); err != nil {
-                return rPath, err
+            if err := os.MkdirAll(gcPath, perm); err != nil {
+                return root, err
             }
             if err := populateWithFiles(gcPath); err != nil {
-                return rPath, err
+                return root, err
             }
         }
     }
 
-    return rPath, nil
+    return root, nil
 }
 
 func populateWithFiles(path string) error {

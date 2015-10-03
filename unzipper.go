@@ -15,7 +15,7 @@ type unzipper struct {
 
 // unzipper.do initialises output file and unzips source there
 func (z *unzipper) do() error {
-    err := os.MkdirAll(z.dst, os.ModeDir)
+    err := os.MkdirAll(z.dst, perm)
     if err != nil { return err }
 
     z.reader, err = zip.OpenReader(z.src)
@@ -41,7 +41,7 @@ func (z *unzipper) unzip(f *zip.File) error {
     fName := filepath.Join(z.dst, f.Name)
     dir, _ := filepath.Split(fName)
 
-    if err := os.MkdirAll(dir, os.ModeDir); err != nil && os.IsNotExist(err) {
+    if err := os.MkdirAll(dir, perm); err != nil && os.IsNotExist(err) {
         return err
     }
 
