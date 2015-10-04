@@ -12,6 +12,7 @@ type zipper struct {
     src    string
     dst    string
     writer *zip.Writer
+    buffer []byte
 }
 
 // zipper.do initialises output file, archive and directory tree walk function
@@ -20,6 +21,8 @@ func (z *zipper) do() error {
     if err != nil {
         return err
     }
+
+    z.buffer = make([]byte, 1<<20)
 
     z.writer = zip.NewWriter(out)
     if err := filepath.Walk(z.src, z.walk); err != nil {
@@ -53,8 +56,7 @@ func (z *zipper) walk(path string, info os.FileInfo, err error) error {
         return err
     }
 
-    b := make([]byte, 1<<20)
-    _, err = io.CopyBuffer(w, file, b)
+    _, err = io.CopyBuffer(w, file, z.buffer)
 
     return err
 }

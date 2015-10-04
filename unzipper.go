@@ -11,12 +11,15 @@ type unzipper struct {
     src    string
     dst    string
     reader *zip.ReadCloser
+    buffer []byte
 }
 
 // unzipper.do initialises output file and unzips source there
 func (z *unzipper) do() error {
     err := os.MkdirAll(z.dst, perm)
     if err != nil { return err }
+
+    z.buffer = make([]byte, 1<<20)
 
     z.reader, err = zip.OpenReader(z.src)
     if err != nil { return err }
@@ -57,8 +60,7 @@ func (z *unzipper) unzip(f *zip.File) error {
     }
     defer w.Close()
 
-    b := make([]byte, 1<<20)
-    if _, err := io.CopyBuffer(w, r, b); err != nil {
+    if _, err := io.CopyBuffer(w, r, z.buffer); err != nil {
         w.Close()
         return err
     }
