@@ -19,7 +19,7 @@ func (t *untarmonster) do() error {
     err := os.MkdirAll(t.dst, perm)
     if err != nil { return err }
 
-    t.buffer = make([]byte, 1<<20)
+    t.buffer = make([]byte, bufSize)
 
     tarball, err := os.Open(t.src)
     if err != nil {

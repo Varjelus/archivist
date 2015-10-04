@@ -22,7 +22,7 @@ func (z *zipper) do() error {
         return err
     }
 
-    z.buffer = make([]byte, 1<<20)
+    z.buffer = make([]byte, bufSize)
 
     z.writer = zip.NewWriter(out)
     if err := filepath.Walk(z.src, z.walk); err != nil {

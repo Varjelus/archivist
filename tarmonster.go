@@ -21,7 +21,7 @@ func (t *tarmonster) do() error {
         return err
     }
 
-    t.buffer = make([]byte, 1<<20)
+    t.buffer = make([]byte, bufSize)
 
     t.writer = tar.NewWriter(out)
     if err := filepath.Walk(t.src, t.walk); err != nil {

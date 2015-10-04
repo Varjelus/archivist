@@ -19,7 +19,7 @@ func (z *unzipper) do() error {
     err := os.MkdirAll(z.dst, perm)
     if err != nil { return err }
 
-    z.buffer = make([]byte, 1<<20)
+    z.buffer = make([]byte, bufSize)
 
     z.reader, err = zip.OpenReader(z.src)
     if err != nil { return err }
