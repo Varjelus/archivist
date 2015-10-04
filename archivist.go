@@ -25,6 +25,6 @@ func Unzip(src, dst string) error {
     return z.do()
 }
 
-func SetFileMode(mode int) {
-    perm = os.FileMode(mode)
+func SetFileMode(mode os.FileMode) {
+    perm = mode
 }
